@@ -1,0 +1,356 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "HealthChecker public API",
+    "version": "2.0",
+    "contact": {
+      "name": "E",
+      "url": "https://khannz.medium.com/about"
+    }
+  },
+  "tags": [
+    {
+      "name": "HealthChecker"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v2/HttpCheck": {
+      "post": {
+        "summary": "HTTP(S) health check",
+        "operationId": "HealthChecker_HttpCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthcheckHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/healthcheckHttpCheckRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HealthChecker"
+        ]
+      }
+    },
+    "/v2/IcmpCheck": {
+      "post": {
+        "summary": "ICMP health check",
+        "operationId": "HealthChecker_IcmpCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthcheckHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/healthcheckIcmpCheckRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HealthChecker"
+        ]
+      }
+    },
+    "/v2/TcpCheck": {
+      "post": {
+        "summary": "TCP health check",
+        "operationId": "HealthChecker_TcpCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthcheckHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/healthcheckTcpCheckRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HealthChecker"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "HttpCheckRequestMethod": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "PATCH",
+        "OPTIONS",
+        "TRACE"
+      ],
+      "default": "GET",
+      "title": "HttpCheckRequest:Method допустимый HTTP метод"
+    },
+    "HttpStatusCodesRange": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "integer",
+          "format": "int32",
+          "title": "начало диапазона"
+        },
+        "to": {
+          "type": "integer",
+          "format": "int32",
+          "title": "конец диапазона"
+        }
+      },
+      "title": "HttpStatusCodes:Range диапазон HTTP статус-ответов"
+    },
+    "healthcheckHealthCheckResponse": {
+      "type": "object",
+      "properties": {
+        "isOk": {
+          "type": "boolean",
+          "title": "если true то получили хороший ответ от backed-а"
+        }
+      },
+      "title": "HealthCheckResponse ответ от HC"
+    },
+    "healthcheckHttpCheckRequest": {
+      "type": "object",
+      "properties": {
+        "addressToCheck": {
+          "type": "string",
+          "title": "адрес IP:PORT"
+        },
+        "queryUri": {
+          "type": "string",
+          "title": "сторка запроса в backend"
+        },
+        "timeout": {
+          "type": "string"
+        },
+        "socketMark": {
+          "type": "string",
+          "format": "int64",
+          "title": "маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend"
+        },
+        "goodStatusCodes": {
+          "$ref": "#/definitions/healthcheckHttpStatusCodes",
+          "title": "список хороших STATUS-ов плученных из ответа"
+        },
+        "header": {
+          "$ref": "#/definitions/healthcheckHttpHeader",
+          "title": "HTTP заголовки"
+        },
+        "useMethod": {
+          "$ref": "#/definitions/HttpCheckRequestMethod",
+          "title": "используемый метод GET, POST, HEAD, etc"
+        },
+        "useScheme": {
+          "$ref": "#/definitions/healthcheckHttpCheckRequestScheme",
+          "title": "использовать определённую HTTP / HTTPS"
+        },
+        "extension": {
+          "$ref": "#/definitions/healthcheckHttpCheckRequestExtension",
+          "title": "расширения"
+        }
+      },
+      "title": "HttpCheckRequest запрос HTTP(s) health check"
+    },
+    "healthcheckHttpCheckRequestExtension": {
+      "type": "object",
+      "properties": {
+        "nearSearchMode": {
+          "type": "boolean",
+          "title": "если true не просматривать полностью ответ от backend-а а лишь наиболее подходящий фрагмент"
+        },
+        "mandatoryData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "данные которые должны быть в ответе от backend-а\nожидаемые данные от backend-a это JSON типа {key:val, key:val} или [{key:val, key:val, ...},{key:val, key:val, ...}]"
+        }
+      },
+      "title": "HttpCheckRequestExtension"
+    },
+    "healthcheckHttpCheckRequestScheme": {
+      "type": "string",
+      "enum": [
+        "HTTP",
+        "HTTPS"
+      ],
+      "default": "HTTP",
+      "title": "HttpCheckRequest:Scheme возможные схемы"
+    },
+    "healthcheckHttpHeader": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/healthcheckHttpHeaderHeader"
+          },
+          "title": "набор значений"
+        }
+      },
+      "title": "HttpHeader HTTP заголовки"
+    },
+    "healthcheckHttpHeaderHeader": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "массив строк значений заголовка"
+        }
+      },
+      "title": "HttpHeader:HeaderData содержит список значений HTTP заголовка"
+    },
+    "healthcheckHttpStatusCodes": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/healthcheckHttpStatusCodesValue"
+          },
+          "title": "массив статусов и диапазонов"
+        }
+      },
+      "title": "HttpStatusCodes набор HTTP статус-кодов используемых для анализа в ответах"
+    },
+    "healthcheckHttpStatusCodesValue": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "единичный статус код"
+        },
+        "range": {
+          "$ref": "#/definitions/HttpStatusCodesRange",
+          "title": "диапазон статус кодов"
+        }
+      },
+      "title": "HttpStatusCodes:Value одно из двух: единичный код или диапазон кодов"
+    },
+    "healthcheckIcmpCheckRequest": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "title": "IP-адрес IPv4|IPv6 или hostname"
+        },
+        "timeout": {
+          "type": "string"
+        },
+        "socketMark": {
+          "type": "string",
+          "format": "int64",
+          "title": "маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend"
+        }
+      },
+      "title": "IcmpCheckRequest запрос ICMP health check"
+    },
+    "healthcheckTcpCheckRequest": {
+      "type": "object",
+      "properties": {
+        "addressToCheck": {
+          "type": "string",
+          "title": "адрес IP:PORT"
+        },
+        "timeout": {
+          "type": "string"
+        },
+        "socketMark": {
+          "type": "string",
+          "format": "int64",
+          "title": "маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend"
+        }
+      },
+      "title": "TcpCheckRequest запрос TCP health check"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "key_int": 100,
+  "key_bool": true,
+  "key2": "value2",
+  "key_null": null,
+  "key3": "value3"
+}

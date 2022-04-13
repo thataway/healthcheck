@@ -1,0 +1,153 @@
+syntax = "proto3";
+package healthcheck;
+
+import "google/protobuf/duration.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+//option go_package = "github.com/thataway/healthcheck/pkg/healthcheck;healthcheck";
+option go_package = "/healthcheck";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "HealthChecker public API";
+    version: "2.0";
+    contact: {
+      name: "E";
+      url: "https://khannz.medium.com/about";
+    };
+  };
+  schemes: [HTTP];
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+//HealthChecker health checker service
+service HealthChecker {
+  //HTTP(S) health check
+  rpc HttpCheck(HttpCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      post: "/v2/HttpCheck"
+      body: "*"
+    };
+  }
+  //ICMP health check
+  rpc IcmpCheck(IcmpCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      post: "/v2/IcmpCheck"
+      body: "*"
+    };
+  }
+  //TCP health check
+  rpc TcpCheck(TcpCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      post: "/v2/TcpCheck"
+      body: "*"
+    };
+  }
+}
+
+
+//HttpHeader HTTP заголовки
+message HttpHeader {
+  //HttpHeader:HeaderData содержит список значений HTTP заголовка
+  message Header {
+    //массив строк значений заголовка
+    repeated string data = 1;
+  }
+  //набор значений
+  map<string, Header> values = 1;
+}
+
+
+//HttpStatusCodes набор HTTP статус-кодов используемых для анализа в ответах
+message HttpStatusCodes {
+  //HttpStatusCodes:Range диапазон HTTP статус-ответов
+  message Range {
+    //начало диапазона
+    int32 from = 1;
+    //конец диапазона
+    int32 to = 2;
+  }
+  //HttpStatusCodes:Value одно из двух: единичный код или диапазон кодов
+  message Value {
+    oneof is {
+      //единичный статус код
+      int32 code = 1;
+      //диапазон статус кодов
+      Range range = 2;
+    };
+  }
+  //массив статусов и диапазонов
+  repeated Value values = 1;
+}
+
+//HttpCheckRequest запрос HTTP(s) health check
+message HttpCheckRequest {
+  //HttpCheckRequest:Method допустимый HTTP метод
+  enum Method {
+    GET     = 0;
+    HEAD    = 1;
+    POST    = 2;
+    PUT     = 3;
+    PATCH   = 4;
+    OPTIONS = 5;
+    TRACE   = 6;
+  }
+  //HttpCheckRequest:Scheme возможные схемы
+  enum Scheme{
+    HTTP = 0;
+    HTTPS = 1;
+  }
+  //адрес IP:PORT
+  string address_to_check = 1;
+  //сторка запроса в backend
+  string query_uri = 2;
+  google.protobuf.Duration timeout = 3;
+  //маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend
+  int64 socket_mark = 4;
+  //список хороших STATUS-ов плученных из ответа
+  HttpStatusCodes good_status_codes = 5;
+  //HTTP заголовки
+  HttpHeader header = 6;
+  //используемый метод GET, POST, HEAD, etc
+  Method use_method = 7;
+  //использовать определённую HTTP / HTTPS
+  Scheme use_scheme = 8;
+  //расширения
+  HttpCheckRequestExtension extension = 9;
+}
+
+//HttpCheckRequestExtension
+message HttpCheckRequestExtension{
+  //если true не просматривать полностью ответ от backend-а а лишь наиболее подходящий фрагмент
+  bool nearSearchMode = 1;
+  //данные которые должны быть в ответе от backend-а
+  //ожидаемые данные от backend-a это JSON типа {key:val, key:val} или [{key:val, key:val, ...},{key:val, key:val, ...}]
+  map<string, string> mandatory_data = 2;
+}
+
+//TcpCheckRequest запрос TCP health check
+message TcpCheckRequest {
+  //адрес IP:PORT
+  string address_to_check = 1;
+  google.protobuf.Duration timeout = 2;
+  //маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend
+  int64 socket_mark = 3;
+}
+
+//IcmpCheckRequest запрос ICMP health check
+message IcmpCheckRequest {
+  //IP-адрес IPv4|IPv6 или hostname
+  string host = 1;
+  google.protobuf.Duration timeout = 2;
+  //маркируем исходящий сокет - свойство необходимое для маршрутизации запроса в реальный backend
+  int64 socket_mark = 3;
+}
+
+
+//HealthCheckResponse ответ от HC
+message HealthCheckResponse {
+  //если true то получили хороший ответ от backed-а
+  bool is_ok = 1;
+}

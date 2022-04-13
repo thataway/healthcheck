@@ -1,0 +1,25 @@
+[
+  null,
+  {
+     "key1": null,
+     "key2": 123
+  },
+  {
+    "k1": null,
+    "k2": null,
+    "k3": null,
+    "key_int": 100,
+    "key_bool": true,
+    "key2": "value2",
+    "key_null": null
+  },
+  100,
+  "some string",
+  null,
+  {
+    "key1": "value1",
+    "key_bool": true,
+    "key_null": null,
+    "key3": "value3"
+  }
+]
