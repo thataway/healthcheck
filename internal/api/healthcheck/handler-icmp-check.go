@@ -13,10 +13,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/thataway/healthcheck/internal/pkg/network"
 	"github.com/thataway/healthcheck/internal/pkg/network/icmp"
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
-	"github.com/pkg/errors"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	netIcmp "golang.org/x/net/icmp"

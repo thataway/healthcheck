@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/thataway/common-lib/pkg/jsonview"
 	"github.com/thataway/healthcheck/internal/pkg/network/tcp"
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"

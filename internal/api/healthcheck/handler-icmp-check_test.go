@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
 	errors2 "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
 	"github.com/stretchr/testify/assert"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 )
 
 //go:embed test-data/*.json

@@ -5,9 +5,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/thataway/healthcheck/internal/pkg/network/tcp"
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
 	"github.com/pkg/errors"
+	"github.com/thataway/healthcheck/internal/pkg/network/tcp"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"

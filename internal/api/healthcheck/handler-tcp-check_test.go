@@ -5,8 +5,8 @@ import (
 	"net"
 	"testing"
 
-	srvDef "github.com/thataway/healthcheck/pkg/healthcheck"
 	"github.com/stretchr/testify/assert"
+	srvDef "github.com/thataway/protos/pkg/api/healthcheck"
 )
 
 func Test_TcpCheckTRUE(t *testing.T) {
